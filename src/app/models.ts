@@ -1,12 +1,28 @@
 export class ItemNode {
   children: ItemNode[];
-  item: string;
+  item: Item;
+}
+
+class Item {
+  label: string;
+  data?: any;
 }
 
 export class ItemFlatNode {
-  item: string;
+  item: Item;
   level: number;
   expandable: boolean;
+}
+
+export interface IDetails {
+  id: string;
+  name: string;
+  business: string;
+  slogan: string;
+  address?: ICompanyAddress;
+  jobAreas?: IEmployee[];
+  projects?: IProject[];
+  fullAddress?: string;
 }
 
 export interface ICompany {

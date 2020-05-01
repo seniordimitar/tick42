@@ -5,7 +5,7 @@ import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
 import {Subscription} from 'rxjs';
 
 import {ChecklistDatabase} from './database.service';
-import {ItemFlatNode, ItemNode} from './models';
+import {IDetails, ItemFlatNode, ItemNode} from './models';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +16,8 @@ import {ItemFlatNode, ItemNode} from './models';
 export class AppComponent implements OnInit, OnDestroy {
   public treeControl: FlatTreeControl<ItemFlatNode>;
   public dataSource: MatTreeFlatDataSource<ItemNode, ItemFlatNode>;
+  public panelOpenState = false;
+  public details: IDetails;
 
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   private _flatNodeMap = new Map<ItemFlatNode, ItemNode>();
@@ -40,7 +42,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public hasChild = (_: number, _nodeData: ItemFlatNode) => _nodeData.expandable;
 
-  public hasNoContent = (_: number, _nodeData: ItemFlatNode) => _nodeData.item === '';
+  public hasNoContent = (_: number, _nodeData: ItemFlatNode) => _nodeData.item.label === '';
 
   public addNewItem(node: ItemFlatNode): void {
     const parentNode = this._flatNodeMap.get(node);
@@ -48,6 +50,13 @@ export class AppComponent implements OnInit, OnDestroy {
       this._database.insertItem(parentNode, '');
       this.treeControl.expand(node);
     }
+  }
+
+  public getDetails(node: ItemFlatNode): void {
+    this.details = node.item.data;
+    this.details.fullAddress = `${this.details.address.country}, ${this.details.address.state},
+    ${this.details.address.city}, ${this.details.address.street}`;
+    console.log(this.details);
   }
 
   public saveNode(node: ItemFlatNode, itemValue: string): void {

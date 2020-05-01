@@ -21,20 +21,21 @@ export class ChecklistDatabase {
 
   public insertItem(parent: ItemNode, name: string): void {
     if (parent.children) {
-      parent.children.push({item: name} as ItemNode);
+      parent.children.push({item: {label: name}} as ItemNode);
       this.dataChange$$.next(this.data);
     }
   }
 
   public updateItem(node: ItemNode, name: string): void {
-    node.item = name;
+    node.item = {
+      label: name
+    };
     this.dataChange$$.next(this.data);
   }
 
   private _initialize(treeData): void {
     const data = Utils.buildFileTree(treeData, 0);
     this.dataChange$$.next(data);
-    console.log(data);
   }
 
   private _getCompanies(): void {
@@ -58,10 +59,9 @@ export class ChecklistDatabase {
       company.address = companyAddresses.find((address) => address.companyId === company.id);
       company.projects = projects.filter((project) => project.companyId === company.id);
       const companyEmployees = employees.filter((employee) => employee.companyId === company.id);
-      company.jobAreas = Utils.mapEmployees(companyEmployees, 'jobArea');
+      company.jobAreas = Utils.groupBy(companyEmployees, 'jobArea');
     });
     companies = Utils.mapJobAreaNames(companies);
-    // TODO sort
     this._initialize(companies);
   }
 }
