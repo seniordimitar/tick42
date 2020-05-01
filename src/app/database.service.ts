@@ -34,6 +34,7 @@ export class ChecklistDatabase {
   private _initialize(treeData): void {
     const data = Utils.buildFileTree(treeData, 0);
     this.dataChange$$.next(data);
+    console.log(data);
   }
 
   private _getCompanies(): void {
@@ -60,7 +61,7 @@ export class ChecklistDatabase {
       company.jobAreas = Utils.mapEmployees(companyEmployees, 'jobArea');
     });
     companies = Utils.mapJobAreaNames(companies);
-    console.log(companies);
+    // TODO sort
     this._initialize(companies);
   }
 }
