@@ -20,9 +20,10 @@ export interface IDetails {
   business: string;
   slogan: string;
   address?: ICompanyAddress;
-  jobAreas?: IEmployee[];
-  projects?: IProject[];
+  jobAreas?: Employee[];
+  projects?: Project[];
   fullAddress?: string;
+  employees?: Employee[];
 }
 
 export interface ICompany {
@@ -31,8 +32,9 @@ export interface ICompany {
   business: string;
   slogan: string;
   address?: ICompanyAddress;
-  jobAreas?: IEmployee[];
-  projects?: IProject[];
+  jobAreas?: object;
+  projects?: Project[];
+  employees?: Employee[];
 }
 
 export interface ICompanyAddress {
@@ -44,7 +46,7 @@ export interface ICompanyAddress {
   companyId: string;
 }
 
-export interface IEmployee {
+export class Employee {
   id: string;
   firstName: string;
   lastName: string;
@@ -55,10 +57,11 @@ export interface IEmployee {
   jobType: string;
 }
 
-export interface IProject {
+export class Project {
   id: string;
   name: string;
   department: string;
   employeesId: string[];
   companyId: string;
+  employees?: Employee[];
 }

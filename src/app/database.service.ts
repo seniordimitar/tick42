@@ -4,7 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, forkJoin} from 'rxjs';
 import {map} from 'rxjs/operators';
 
-import {ICompany, ICompanyAddress, IEmployee, IProject, ItemNode} from './models';
+import {ICompany, ICompanyAddress, Employee, Project, ItemNode} from './models';
 import {Utils} from './utils';
 
 @Injectable()
@@ -19,20 +19,6 @@ export class ChecklistDatabase {
     return this.dataChange$$.value;
   }
 
-  public insertItem(parent: ItemNode, name: string): void {
-    if (parent.children) {
-      parent.children.push({item: {label: name}} as ItemNode);
-      this.dataChange$$.next(this.data);
-    }
-  }
-
-  public updateItem(node: ItemNode, name: string): void {
-    node.item = {
-      label: name
-    };
-    this.dataChange$$.next(this.data);
-  }
-
   private _initialize(treeData): void {
     const data = Utils.buildFileTree(treeData, 0);
     this.dataChange$$.next(data);
@@ -40,8 +26,8 @@ export class ChecklistDatabase {
 
   private _getCompanies(): void {
     const companies$ = this._http.get('../assets/data/companies.json').pipe(map((companies) => companies as ICompany[]));
-    const employees$ = this._http.get('../assets/data/employees.json').pipe(map((employees) => employees as IEmployee[]));
-    const projects$ = this._http.get('../assets/data/projects.json').pipe(map((projects) => projects as IProject[]));
+    const employees$ = this._http.get('../assets/data/employees.json').pipe(map((employees) => employees as Employee[]));
+    const projects$ = this._http.get('../assets/data/projects.json').pipe(map((projects) => projects as Project[]));
     const companyAddresses$ = this._http.get('../assets/data/company-addresses.json').pipe(
       map((companyAddresses) => companyAddresses as ICompanyAddress[]));
 
@@ -52,14 +38,14 @@ export class ChecklistDatabase {
 
   private _mapData(companies: ICompany[],
                    companyAddresses: ICompanyAddress[],
-                   employees: IEmployee[],
-                   projects: IProject[]
+                   employees: Employee[],
+                   projects: Project[]
   ): void {
     companies.forEach((company) => {
       company.address = companyAddresses.find((address) => address.companyId === company.id);
       company.projects = projects.filter((project) => project.companyId === company.id);
-      const companyEmployees = employees.filter((employee) => employee.companyId === company.id);
-      company.jobAreas = Utils.groupBy(companyEmployees, 'jobArea');
+      company.employees = employees.filter((employee) => employee.companyId === company.id);
+      company.jobAreas = Utils.groupBy(company.employees, 'jobArea');
     });
     companies = Utils.mapJobAreaNames(companies);
     this._initialize(companies);

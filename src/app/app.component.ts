@@ -4,8 +4,12 @@ import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
 
 import {Subscription} from 'rxjs';
 
+import { v4 as uuid } from 'uuid';
+
 import {ChecklistDatabase} from './database.service';
-import {IDetails, ItemFlatNode, ItemNode} from './models';
+import {IDetails, Employee, Project, ItemFlatNode, ItemNode} from './models';
+import {MatDialog} from '@angular/material/dialog';
+import {NewEmployeeComponent} from './new-employee/new-employee.component';
 
 @Component({
   selector: 'app-root',
@@ -16,8 +20,9 @@ import {IDetails, ItemFlatNode, ItemNode} from './models';
 export class AppComponent implements OnInit, OnDestroy {
   public treeControl: FlatTreeControl<ItemFlatNode>;
   public dataSource: MatTreeFlatDataSource<ItemNode, ItemFlatNode>;
-  public panelOpenState = false;
-  public details: IDetails;
+  public isCompanyDetailsVisible: IDetails;
+  public isEmployeeDetailsVisible: Employee;
+  public isAreaDetailsVisible: { employees: number, projects: number };
 
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   private _flatNodeMap = new Map<ItemFlatNode, ItemNode>();
@@ -25,8 +30,12 @@ export class AppComponent implements OnInit, OnDestroy {
   private _nestedNodeMap = new Map<ItemNode, ItemFlatNode>();
   private _treeFlattener: MatTreeFlattener<ItemNode, ItemFlatNode>;
   private _subscription: Subscription = new Subscription();
+  private _currentEmployee: Employee;
+  private _dialogRef$: any;
 
-  constructor(private _database: ChecklistDatabase) {
+  constructor(private _database: ChecklistDatabase,
+              private _matDialog: MatDialog
+  ) {
   }
 
   public ngOnInit(): void {
@@ -42,28 +51,96 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public hasChild = (_: number, _nodeData: ItemFlatNode) => _nodeData.expandable;
 
-  public hasNoContent = (_: number, _nodeData: ItemFlatNode) => _nodeData.item.label === '';
-
-  public addNewItem(node: ItemFlatNode): void {
-    const parentNode = this._flatNodeMap.get(node);
-    if (parentNode) {
-      this._database.insertItem(parentNode, '');
-      this.treeControl.expand(node);
-    }
-  }
-
   public getDetails(node: ItemFlatNode): void {
-    this.details = node.item.data;
-    this.details.fullAddress = `${this.details.address.country}, ${this.details.address.state},
-    ${this.details.address.city}, ${this.details.address.street}`;
-    console.log(this.details);
+    if (node.item.data) {
+      this.isAreaDetailsVisible = null;
+      this.isEmployeeDetailsVisible = null;
+      this.isCompanyDetailsVisible = node.item.data;
+      this.isCompanyDetailsVisible.fullAddress = `${this.isCompanyDetailsVisible.address.country},
+     ${this.isCompanyDetailsVisible.address.state},
+    ${this.isCompanyDetailsVisible.address.city},
+    ${this.isCompanyDetailsVisible.address.street}`;
+      this.isCompanyDetailsVisible.projects.forEach((project) => {
+        project.employees = this._getEmployees(project);
+      });
+    } else {
+      this.isEmployeeDetailsVisible = null;
+      this.isCompanyDetailsVisible = null;
+      this.isAreaDetailsVisible = {
+        employees: 4,
+        projects: 10
+      };
+      console.log(node);
+      // TODO
+    }
   }
 
-  public saveNode(node: ItemFlatNode, itemValue: string): void {
-    const nestedNode = this._flatNodeMap.get(node);
-    if (nestedNode) {
-      this._database.updateItem(nestedNode, itemValue);
+  public getEmployee(employee): void {
+    this.isAreaDetailsVisible = null;
+    this.isCompanyDetailsVisible = null;
+    this.isEmployeeDetailsVisible = employee;
+  }
+
+  public addProject(company): void {
+    const project = new Project();
+    project.id = uuid();
+    project.name = '';
+    project.department = '';
+    project.employeesId = [];
+    project.employees = [];
+    project.companyId = company.id;
+    company.projects.push(project);
+  }
+
+  public removeProject(project, company): void {
+    const projIndex = company.projects.findIndex((proj) => proj.id === project.id);
+    company.projects.splice(projIndex, 1);
+  }
+
+  public addEmployee(project): void {
+    let employee = new Employee();
+    employee.id = uuid();
+    employee.firstName = '';
+    employee.lastName = '';
+    employee.dateOfBirth = '';
+    employee.jobTitle = '';
+    employee.jobArea = '';
+    employee.jobType = '';
+    employee.companyId = project.companyId;
+    project.employeesId = project.employeesId.length ? project.employeesId : [];
+    project.employees = project.employees.length ? project.employees : [];
+    project.employeesId.push(employee.id);
+
+    this._dialogRef$ = this._matDialog.open(NewEmployeeComponent, {data: employee});
+
+    this._dialogRef$.afterClosed().subscribe(response => {
+        if (!response) {
+          this.removeEmployee(employee, project);
+        } else {
+          employee = {...response};
+          console.log(response);
+          console.log(employee);
+          project.employees.push(employee);
+        }
+      });
+  }
+
+  public removeEmployee(employee, project): void {
+    const empIdsIndex = project.employeesId.findIndex((employeeId) => employeeId === employee.id);
+    project.employeesId.splice(empIdsIndex, 1);
+    const empIndex = project.employees.findIndex((e) => e.id === employee.id);
+    project.employees.splice(empIndex, 1);
+  }
+
+  private _getEmployees(project): Employee[] {
+    project.employees = [];
+    project.employeesId.forEach((employeeId) => {
+      this._currentEmployee = this.isCompanyDetailsVisible.employees.find((employee) => employee.id === employeeId);
+    });
+    if (this._currentEmployee) {
+      project.employees.push(this._currentEmployee);
     }
+    return project.employees;
   }
 
   private _initData(): void {
@@ -91,5 +168,5 @@ export class AppComponent implements OnInit, OnDestroy {
     this._flatNodeMap.set(flatNode, node);
     this._nestedNodeMap.set(node, flatNode);
     return flatNode;
-  }
+  };
 }

@@ -1,0 +1,32 @@
+.mat-dialog-container {
+  padding: 0;
+}
+
+.mat-toolbar {
+  flex: 1 0 auto;
+  min-height: initial;
+}
+
+.toolbar-bottom {
+  height: auto;
+}
+
+.dialog-content-wrapper {
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-toolbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.edit-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+}
