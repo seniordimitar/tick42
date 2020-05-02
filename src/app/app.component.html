@@ -18,14 +18,11 @@
   </mat-tree>
 
   <div *ngIf="isCompanyDetailsVisible">
-    <p>Address: {{isCompanyDetailsVisible.fullAddress}}
-      <button mat-icon-button
-              matTooltip="Close"
-              matTooltipPosition="below"
-              (click)="isCompanyDetailsVisible = null">
-        <mat-icon>close</mat-icon>
-      </button>
+    <p>Name: {{isCompanyDetailsVisible.name}}
+      <button mat-icon-button matTooltip="Close" matTooltipPosition="below" (click)="isCompanyDetailsVisible = null">
+        <mat-icon>close</mat-icon></button>
     </p>
+    <p>Address: {{isCompanyDetailsVisible.fullAddress}}</p>
     <button mat-button
             class="mat-btn"
             (click)="addProject(isCompanyDetailsVisible)">

@@ -118,8 +118,6 @@ export class AppComponent implements OnInit, OnDestroy {
           this.removeEmployee(employee, project);
         } else {
           employee = {...response};
-          console.log(response);
-          console.log(employee);
           project.employees.push(employee);
         }
       });
@@ -168,5 +166,5 @@ export class AppComponent implements OnInit, OnDestroy {
     this._flatNodeMap.set(flatNode, node);
     this._nestedNodeMap.set(node, flatNode);
     return flatNode;
-  };
+  }
 }
