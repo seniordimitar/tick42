@@ -17,107 +17,16 @@
     </mat-tree-node>
   </mat-tree>
 
-  <div *ngIf="isCompanyDetailsVisible">
-    <p>Name: {{isCompanyDetailsVisible.name}}
-      <button mat-icon-button matTooltip="Close" matTooltipPosition="below" (click)="isCompanyDetailsVisible = null">
-        <mat-icon>close</mat-icon>
-      </button>
-    </p>
-    <p>Address: {{isCompanyDetailsVisible.fullAddress}}</p>
-    <button mat-button
-            class="mat-btn"
-            (click)="addProject(isCompanyDetailsVisible)">
-      <mat-icon>add</mat-icon>
-      Add Project
-    </button>
-    <ng-container *ngIf="isCompanyDetailsVisible.projects.length; else emptyInfo">
-      <mat-accordion>
-        <mat-expansion-panel *ngFor="let project of isCompanyDetailsVisible.projects">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              <mat-form-field>
-                <mat-label>Project</mat-label>
-                <input matInput [value]="project.name" (click)="$event.stopPropagation();">
-              </mat-form-field>
-            </mat-panel-title>
-            <mat-panel-description>
-              <mat-form-field>
-                <mat-label>Department</mat-label>
-                <input matInput [value]="project.department" (click)="$event.stopPropagation();">
-              </mat-form-field>
-              <button mat-icon-button
-                      matTooltip="Remove Project"
-                      matTooltipPosition="below"
-                      (click)="$event.stopPropagation(); removeProject(project, isCompanyDetailsVisible)">
-                <mat-icon>remove</mat-icon>
-              </button>
-            </mat-panel-description>
-          </mat-expansion-panel-header>
+  <app-company-details [isCompanyDetailsVisible]="isCompanyDetailsVisible"
+                       (hideDetails)="isCompanyDetailsVisible = null"
+                       (addProject)="addProject($event)"
+                       (removeProject)="removeProject($event)"
+                       (addEmployee)="addEmployee($event)"
+                       (removeEmployee)="removeEmployee($event)"></app-company-details>
 
-          <button mat-button (click)="addEmployee(project)">
-            <mat-icon>add</mat-icon>
-            Add Employee To This Project
-          </button>
-          <div *ngFor="let employee of project.employees">
-            <p>Name: {{employee.firstName}} {{employee.lastName}}
-              <button mat-icon-button
-                      matTooltip="Remove This Employee From The Project"
-                      matTooltipPosition="below"
-                      (click)="removeEmployee(employee, project)">
-                <mat-icon>remove</mat-icon>
-              </button>
-            </p>
-            <p>Date of birth: {{employee.dateOfBirth | date: 'dd/MM/yyyy'}}</p>
-            <p>Job Title: {{employee.jobTitle}}</p>
-            <p>Job Area: {{employee.jobArea}}</p>
-            <p>Job Type: {{employee.jobType}}</p>
-          </div>
-        </mat-expansion-panel>
-      </mat-accordion>
-    </ng-container>
-    <ng-template #emptyInfo>
-      <p class="empty">Company without projects</p>
-    </ng-template>
-  </div>
+  <app-employee-details [isEmployeeDetailsVisible]="isEmployeeDetailsVisible"
+                        (hideDetails)="isEmployeeDetailsVisible = null"></app-employee-details>
 
-  <ng-container *ngIf="isEmployeeDetailsVisible">
-    <mat-card class="example-card">
-      <mat-card-header>
-        <div mat-card-avatar class="example-header-image"></div>
-        <mat-card-title>
-          {{isEmployeeDetailsVisible.firstName}} {{isEmployeeDetailsVisible.lastName}}
-          <button mat-icon-button class="close-btn"
-                  (click)="isEmployeeDetailsVisible = null">
-            <mat-icon>close</mat-icon>
-          </button>
-        </mat-card-title>
-        <mat-card-subtitle>{{isEmployeeDetailsVisible.jobType}}</mat-card-subtitle>
-      </mat-card-header>
-      <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu">
-      <mat-card-content>
-        <p>Date of birth: {{isEmployeeDetailsVisible.dateOfBirth | date: 'dd/MM/yyyy'}}</p>
-        <p>Job Area: {{isEmployeeDetailsVisible.jobArea}}</p>
-        <p>Job Title: {{isEmployeeDetailsVisible.jobTitle}}</p>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-button>EMAIL</button>
-        <button mat-button>CALL</button>
-      </mat-card-actions>
-    </mat-card>
-  </ng-container>
-
-  <ng-container *ngIf="isAreaDetailsVisible">
-    <mat-card class="example-card">
-      <mat-card-header>
-        <mat-card-title>
-          {{isAreaDetailsVisible.employees}} employees
-          <button mat-icon-button class="close-btn"
-                  (click)="isAreaDetailsVisible = null">
-            <mat-icon>close</mat-icon>
-          </button>
-        </mat-card-title>
-        <mat-card-subtitle>Тhey participate in {{isAreaDetailsVisible.projects}} projects</mat-card-subtitle>
-      </mat-card-header>
-    </mat-card>
-  </ng-container>
+  <app-area-details [isAreaDetailsVisible]="isAreaDetailsVisible"
+                    (hideDetails)="isAreaDetailsVisible = null"></app-area-details>
 </main>

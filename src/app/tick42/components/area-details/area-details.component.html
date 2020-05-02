@@ -1,0 +1,13 @@
+<ng-container *ngIf="isAreaDetailsVisible">
+  <mat-card class="example-card">
+    <mat-card-header>
+      <mat-card-title>
+        {{isAreaDetailsVisible.employees}} employees
+        <button mat-icon-button class="close-btn" (click)="hideDetails.emit()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-card-title>
+      <mat-card-subtitle>Тhey participate in {{isAreaDetailsVisible.projects}} projects</mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+</ng-container>

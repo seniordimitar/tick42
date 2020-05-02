@@ -4,13 +4,13 @@ import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
 
 import {Subscription} from 'rxjs';
 
-import { v4 as uuid } from 'uuid';
+import {v4 as uuid} from 'uuid';
 
-import {ChecklistDatabase} from './database.service';
-import {IDetails, Employee, Project, ItemFlatNode, ItemNode} from './models';
+import {ChecklistDatabase} from './tick42/services/database.service';
+import {Employee, IDetails, ItemFlatNode, ItemNode, Project} from './tick42/models/models';
 import {MatDialog} from '@angular/material/dialog';
-import {NewEmployeeComponent} from './new-employee/new-employee.component';
-import {Utils} from './utils';
+import {NewEmployeeComponent} from './tick42/components/new-employee/new-employee.component';
+import {Utils} from './tick42/utils/utils';
 
 @Component({
   selector: 'app-root',
@@ -40,7 +40,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this._treeFlattener = new MatTreeFlattener(this._transformer, this._getLevel, this._isExpandable, this._getChildren);
+    this._treeFlattener = new MatTreeFlattener(this._treeTransformer, this._getLevel, this._isExpandable, this._getChildren);
     this.treeControl = new FlatTreeControl<ItemFlatNode>(this._getLevel, this._isExpandable);
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this._treeFlattener);
     this._initData();
@@ -67,7 +67,7 @@ export class AppComponent implements OnInit, OnDestroy {
     } else {
       this.isEmployeeDetailsVisible = null;
       this.isCompanyDetailsVisible = null;
-      const company = this.dataSource.data.find( (item) => item.item.data.id === node.item.data.companyId);
+      const company = this.dataSource.data.find((item) => item.item.data.id === node.item.data.companyId);
       const employees = Utils.getCompanyAreaInfo(company.item.data, node.item.label);
       const projects = Utils.getProjectParticipants(company.item.data.projects, employees);
       this.isAreaDetailsVisible = {
@@ -94,9 +94,9 @@ export class AppComponent implements OnInit, OnDestroy {
     company.projects.push(project);
   }
 
-  public removeProject(project, company): void {
-    const projIndex = company.projects.findIndex((proj) => proj.id === project.id);
-    company.projects.splice(projIndex, 1);
+  public removeProject(event): void {
+    const projIndex = event.company.projects.findIndex((proj) => proj.id === event.project.id);
+    event.company.projects.splice(projIndex, 1);
   }
 
   public addEmployee(project): void {
@@ -116,20 +116,20 @@ export class AppComponent implements OnInit, OnDestroy {
     this._dialogRef$ = this._matDialog.open(NewEmployeeComponent, {data: employee});
 
     this._dialogRef$.afterClosed().subscribe(response => {
-        if (!response) {
-          this.removeEmployee(employee, project);
-        } else {
-          employee = {...response};
-          project.employees.push(employee);
-        }
-      });
+      if (!response) {
+        this.removeEmployee({employee, project});
+      } else {
+        employee = {...response};
+        project.employees.push(employee);
+      }
+    });
   }
 
-  public removeEmployee(employee, project): void {
-    const empIdsIndex = project.employeesId.findIndex((employeeId) => employeeId === employee.id);
-    project.employeesId.splice(empIdsIndex, 1);
-    const empIndex = project.employees.findIndex((e) => e.id === employee.id);
-    project.employees.splice(empIndex, 1);
+  public removeEmployee(event): void {
+    const empIdsIndex = event.project.employeesId.findIndex((employeeId) => employeeId === event.employee.id);
+    event.project.employeesId.splice(empIdsIndex, 1);
+    const empIndex = event.project.employees.findIndex((e) => e.id === event.employee.id);
+    event.project.employees.splice(empIndex, 1);
   }
 
   private _getEmployees(project): Employee[] {
@@ -157,7 +157,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private _getChildren = (node: ItemNode): ItemNode[] => node.children;
 
-  private _transformer = (node: ItemNode, level: number) => {
+  private _treeTransformer = (node: ItemNode, level: number) => {
     const existingNode = this._nestedNodeMap.get(node);
     const flatNode = existingNode && existingNode.item === node.item
       ? existingNode

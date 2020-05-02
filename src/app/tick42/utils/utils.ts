@@ -1,4 +1,4 @@
-import {ItemNode} from './models';
+import {ItemNode} from '../models/models';
 
 export class Utils {
 

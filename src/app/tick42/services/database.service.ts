@@ -4,8 +4,8 @@ import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, forkJoin} from 'rxjs';
 import {map} from 'rxjs/operators';
 
-import {Employee, ICompany, ICompanyAddress, ItemNode, Project} from './models';
-import {Utils} from './utils';
+import {Employee, ICompany, ICompanyAddress, ItemNode, Project} from '../models/models';
+import {Utils} from '../utils/utils';
 
 @Injectable()
 export class ChecklistDatabase {

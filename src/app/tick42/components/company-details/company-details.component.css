@@ -1,0 +1,13 @@
+.empty {
+  text-align: center;
+  font-weight: bold;
+}
+
+mat-expansion-panel-header {
+  height: 65px !important;
+}
+
+.mat-btn {
+  padding: 5px;
+  margin: 5px;
+}
