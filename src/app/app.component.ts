@@ -10,6 +10,7 @@ import {ChecklistDatabase} from './database.service';
 import {IDetails, Employee, Project, ItemFlatNode, ItemNode} from './models';
 import {MatDialog} from '@angular/material/dialog';
 import {NewEmployeeComponent} from './new-employee/new-employee.component';
+import {Utils} from './utils';
 
 @Component({
   selector: 'app-root',
@@ -51,8 +52,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public hasChild = (_: number, _nodeData: ItemFlatNode) => _nodeData.expandable;
 
-  public getDetails(node: ItemFlatNode): void {
-    if (node.item.data) {
+  public getDetails(node: ItemNode): void {
+    if (!node.item.data.dateOfBirth) {
       this.isAreaDetailsVisible = null;
       this.isEmployeeDetailsVisible = null;
       this.isCompanyDetailsVisible = node.item.data;
@@ -66,12 +67,13 @@ export class AppComponent implements OnInit, OnDestroy {
     } else {
       this.isEmployeeDetailsVisible = null;
       this.isCompanyDetailsVisible = null;
+      const company = this.dataSource.data.find( (item) => item.item.data.id === node.item.data.companyId);
+      const employees = Utils.getCompanyAreaInfo(company.item.data, node.item.label);
+      const projects = Utils.getProjectParticipants(company.item.data.projects, employees);
       this.isAreaDetailsVisible = {
-        employees: 4,
-        projects: 10
+        employees: employees.length,
+        projects: projects.length
       };
-      console.log(node);
-      // TODO
     }
   }
 

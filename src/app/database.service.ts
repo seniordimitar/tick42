@@ -4,7 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, forkJoin} from 'rxjs';
 import {map} from 'rxjs/operators';
 
-import {ICompany, ICompanyAddress, Employee, Project, ItemNode} from './models';
+import {Employee, ICompany, ICompanyAddress, ItemNode, Project} from './models';
 import {Utils} from './utils';
 
 @Injectable()

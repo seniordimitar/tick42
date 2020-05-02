@@ -20,7 +20,8 @@
   <div *ngIf="isCompanyDetailsVisible">
     <p>Name: {{isCompanyDetailsVisible.name}}
       <button mat-icon-button matTooltip="Close" matTooltipPosition="below" (click)="isCompanyDetailsVisible = null">
-        <mat-icon>close</mat-icon></button>
+        <mat-icon>close</mat-icon>
+      </button>
     </p>
     <p>Address: {{isCompanyDetailsVisible.fullAddress}}</p>
     <button mat-button
@@ -54,7 +55,8 @@
           </mat-expansion-panel-header>
 
           <button mat-button (click)="addEmployee(project)">
-            <mat-icon>add</mat-icon>Add Employee To This Project
+            <mat-icon>add</mat-icon>
+            Add Employee To This Project
           </button>
           <div *ngFor="let employee of project.employees">
             <p>Name: {{employee.firstName}} {{employee.lastName}}

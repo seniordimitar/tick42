@@ -37,9 +37,36 @@ export class Utils {
           };
         }
       } else {
+        node.item = {
+          label: key,
+          data: value[0].data
+        };
         node.children = Utils.buildFileTree(value, level + 1);
       }
       return accumulator.concat(node);
     }, []);
+  }
+
+  public static getCompanyAreaInfo(company, area) {
+    return Object.keys(company.jobAreas).reduce((accumulator, key) => {
+      if (key === area) {
+        const value = company.jobAreas[key];
+        return accumulator.concat(value);
+      }
+      return accumulator;
+    }, []);
+  }
+
+  public static getProjectParticipants(projects, employees) {
+    const participants = [];
+    projects.forEach((project) => {
+      employees.forEach((emp) => {
+        const participant = project.employeesId.find( id => id === emp.data.id);
+        if (participant) {
+          participants.push(participant);
+        }
+      });
+    });
+    return participants;
   }
 }
