@@ -29,7 +29,8 @@ import { CompanyDetailsComponent } from './tick42/components/company-details/com
     FormsModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [EmployeeDetailsComponent]
 })
 export class AppModule {
 }
